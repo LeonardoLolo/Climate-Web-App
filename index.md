@@ -30,7 +30,11 @@ let lastStationID = "";
 let lastStationName = "";
 
 const container = display(document.createElement("div"));
-container.style = `display: flex; flex-direction: column; width: 125%; overflow: visible;`;
+container.style = `
+  display: flex; 
+  flex-direction: column; 
+  width: 125%; 
+  overflow: visible;`;
 
 // Creando el header
 const header = document.createElement("div");
@@ -50,7 +54,7 @@ header.style = `
 // Creando el logo izquierdo
 const logoLeft = document.createElement("img");
 logoLeft.src = "https://cdat.uprh.edu/~leonardo.morales2/UPRH_logo";
-logoLeft.style = "height: 50px; max-width: 150px; object-fit: contain;";
+logoLeft.style = "height: 70px; max-width: 180px; object-fit: contain;";
 
 // Definiendo el contenedor de los titulos
 const titleContainer = document.createElement("div");
@@ -80,41 +84,52 @@ titleContainer.appendChild(author);
 // Definiendo el logo derecho
 const logoRight = document.createElement("img");
 logoRight.src = "https://cdat.uprh.edu/~leonardo.morales2/CDAT_logo";
-logoRight.style = "height: 50px; max-width: 150px; object-fit: contain;";
+logoRight.style = "height: 70px; max-width: 180px; object-fit: contain;";
 
-// El enlace a mi Github
 const githubLink = document.createElement("a");
-  githubLink.href = "https://github.com/LeonardoLolo/Climate-Web-App/blob/main/index.md";  
-  githubLink.target = "_blank";
-  githubLink.rel = "noopener noreferrer";
-  githubLink.title = "Visita mi Github"; 
- 
-// Definiendo el icono de Github 
+githubLink.href = "https://github.com/LeonardoLolo/Climate-Web-App/blob/main/index.md";
+githubLink.target = "_blank";
+githubLink.rel = "noopener noreferrer";
+githubLink.title = "Visita mi GitHub";
+
+// Crear imagen del logo
 const githubIcon = document.createElement("img");
-  githubIcon.src = "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg";
-  githubIcon.alt = "GitHub";
-  githubIcon.style = `
-    height: 32px;
-    width: 32px;
-    object-fit: contain;
-    margin-left: 10px;
-    filter: var(--github-filter);
-    transition: transform 0.2s;
-    cursor: pointer;
-  `;
-  
+
+// Determinar si el tema es oscuro
+const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+githubIcon.src = prefersDark
+  ? "https://cdat.uprh.edu/~leonardo.morales2/githubWhite_logo" // Logo blanco
+  : "https://raw.githubusercontent.com/devicons/devicon/master/icons/github/github-original.svg"; // Logo oscuro
+
+githubIcon.alt = "GitHub";
+githubIcon.style = `
+  height: 42px;
+  width: 42px;
+  object-fit: contain;
+  margin-left: 10px;
+  transition: transform 0.2s;
+  cursor: pointer;
+`;
+
+// Actualiza el icono cuando se cambia de color el background
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
+  githubIcon.src = e.matches
+    ? "https://cdat.uprh.edu/~leonardo.morales2/githubWhite_logo"
+    : "https://raw.githubusercontent.com/devicons/devicon/master/icons/github/github-original.svg";
+});
+
 githubIcon.addEventListener("mouseenter", () => githubIcon.style.transform = "scale(1.1)");
 githubIcon.addEventListener("mouseleave", () => githubIcon.style.transform = "scale(1)");
-  
-header.appendChild(logoLeft);
+
 githubLink.appendChild(githubIcon);
+header.appendChild(logoLeft);
 header.appendChild(githubLink);
 header.appendChild(titleContainer);
 header.appendChild(logoRight);
 container.appendChild(header);
 
 // Tema adaptativo oscuro/claro
-const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 const root = document.documentElement;
 
 if (prefersDark) {
@@ -129,13 +144,20 @@ if (prefersDark) {
   root.style.setProperty('--header-subtext', '#444');
 }
 
+//  Contenedor de las opciones del grafico
 const layoutContainer = document.createElement("div");
-layoutContainer.style = `display: flex; height: 650px; width: 100%; overflow: visible`;
+layoutContainer.style = `
+  display: flex; 
+  height: 650px; 
+  width: 100%; 
+  overflow: visible`;
 container.appendChild(layoutContainer);
 
 // Contenedor del mapa (izquierda)
 const mapContainer = document.createElement("div");
-mapContainer.style = `flex: 0.50; height: 100%;`;
+mapContainer.style = `
+  flex: 0.50; 
+  height: 100%;`;
 layoutContainer.appendChild(mapContainer);
 
 // Contenedor del gráfico (derecha)
@@ -147,6 +169,8 @@ chartContainer.style = `
   display: flex;
   flex-direction: column;
   overflow: visible;
+  margin-left: 10px;
+  margin-bottom: 50px;
 `;
 layoutContainer.appendChild(chartContainer);
 
@@ -230,7 +254,7 @@ chartContainer.appendChild(downloadBtn);
 
 // Título de la estación
 const chartTitle = document.createElement("h3");
-chartTitle.style = "margin: 5px 0; font-weight: bold; text-align: center;";
+chartTitle.style = "margin: 5px 0; padding-left: 40px; font-weight: bold; text-align: center;";
 chartTitle.textContent = "Selecciona un círculo en el mapa";
 chartContainer.appendChild(chartTitle);
 
@@ -280,7 +304,7 @@ function movingAverage(data, windowSize = 7) {
   return result;
 }
 
-// Inicializar Leaflet
+// Inicializar el mapa
 const map = L.map(mapContainer).setView([18.2208, -66.5901], 9);
 L.tileLayer(
   "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
@@ -330,6 +354,7 @@ function getData(data) {
     d.flag || ""
   ]);
 
+  // Ciclo for que valida las estaciones a graficar
   for (let i = 0; i < lat.length; i++) {
     if (cantidad[i] >= 5 && !isNaN(lat[i]) && !isNaN(lon[i])) {
       const circle = L.circle([lat[i], lon[i]], {
@@ -359,6 +384,8 @@ function getData(data) {
     }
   }
 }
+
+let yLabel = document.createElement("div"); // se actualizará dinámicamente más adelante
 
 // Funcion que dibuja la grafica de linea de las estaciones
 async function buscarEstacion(stationID, nombreLugar) {
@@ -397,25 +424,55 @@ async function buscarEstacion(stationID, nombreLugar) {
 
     chartTitle.innerHTML = `<div>ID: ${stationID}</div><div>${nombreLugar}</div>`;
     mostrarPlot();
-    plotArea.innerHTML = "";
 
-    // Elegir entre original o suavizado
+    // Preparar yLabel si no ha sido estilizado
+    if (!yLabel.hasAttribute("data-initialized")) {
+      yLabel.style = `
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        font-size: 14px;
+        text-align: center;
+        color: currentColor;
+        margin-right: 10px;
+        padding-right: 5px;
+        white-space: nowrap;
+      `;
+      yLabel.setAttribute("data-initialized", "true");
+    }
+    yLabel.textContent = variableLabels[variableSeleccionada]; // actualizar texto
+
+    // Crear contenedor para label + plot
+    const plotWrapper = document.createElement("div");
+    plotWrapper.style = `display: flex; align-items: center;`;
+    plotWrapper.appendChild(yLabel);
+
+    const plotAreaInner = document.createElement("div");
+    plotAreaInner.style = "flex: 1;";
+    plotWrapper.appendChild(plotAreaInner);
+
+    plotArea.innerHTML = "";
+    plotArea.appendChild(plotWrapper);
+
     const windowSize = parseInt(windowSelect.value);
     const datosGraficar = smoothCheckbox.checked
       ? movingAverage(currentFilteredData, windowSize)
       : currentFilteredData;
 
-    const width = plotArea.getBoundingClientRect().width || 600;  
+    // Ancho del plot
+    const width = plotArea.getBoundingClientRect().width || 600;
 
     const plt = Plot.plot({
       y: {
         grid: true,
-        label: `↑ ${variableLabels[variableSeleccionada]}`,
+        label: "",
+        labelArrow: null,
         tickFormat: d => `${d.toFixed(1)}`
       },
       x: {
-        label: "Fecha →",
-        labelOffset: 40,
+        label: "Fecha",
+        labelAnchor: "center",
+        labelOffset: 30,
+        labelArrow: null,
         nice: true
       },
       marks: [
@@ -425,18 +482,19 @@ async function buscarEstacion(stationID, nombreLugar) {
           y: "value",
           tip: true, 
           stroke: "red" 
-          }),
-    ],
+        })
+      ],
       width: width,
       height: 450
     });
 
-    plotArea.appendChild(plt);
+    plotAreaInner.appendChild(plt);
 
   } catch (e) {
     console.error(e);
   }
 }
+
 
 // Inicializar el mapa con estaciones
 getData(df);
