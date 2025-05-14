@@ -84,10 +84,10 @@ logoRight.style = "height: 50px; max-width: 150px; object-fit: contain;";
 
 // El enlace a mi Github
 const githubLink = document.createElement("a");
-  githubLink.href = "https://fluffy-memory-977pxpvv46xxcx7qv.github.dev/";  
+  githubLink.href = "https://github.com/LeonardoLolo/Climate-Web-App/blob/main/index.md";  
   githubLink.target = "_blank";
   githubLink.rel = "noopener noreferrer";
-  githubLink.title = "Ver el codigo"; 
+  githubLink.title = "Visita mi Github"; 
  
 // Definiendo el icono de Github 
 const githubIcon = document.createElement("img");
